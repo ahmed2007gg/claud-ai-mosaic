@@ -279,7 +279,7 @@ async def cmd_start(message: types.Message):
     if user_id not in welcomed_users:
         welcomed_users.add(user_id)
         welcome = (
-            f"✨ <b>مرحبا islem </b> ✨\n\n"
+            f"✨ <b>مرحبا {name} </b> ✨\n\n"
             f"يسعدنا نرحبو بيك في خدمة السيرفر الخاص 👑\n\n"
             f"من هاد اللحظة بوتك يدور على حسابك وحدك\n"
             f"— 24/7 بلا ما يوقف ⚡\n\n"
@@ -300,7 +300,7 @@ async def cmd_start(message: types.Message):
     quiet_str = f"{quiet_start:02d}:00 → {quiet_end:02d}:00" if (quiet_start or quiet_end) else "معطلة"
     hb_str    = _fmt_secs(heartbeat_interval) if heartbeat_interval else "معطل"
     text = (
-        f"👋 مرحبا <b>islem</b>!\n\n"
+        f"👋 مرحبا <b> {name} </b>!\n\n"
         "🇩🇿 <b>Mosaic Visa Monitor</b>\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
         f"📍 الجزائر  : {status_icon('algiers')} — {interval_label('algiers')} — نقصان≥{DROP_THRESHOLDS['algiers']}\n"
