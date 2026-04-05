@@ -60,6 +60,9 @@ last_heartbeat: float   = 0.0
 # ── إحصائيات ──
 stats: dict = {}
 
+# ── الزبائن اللي وصلتهم رسالة الترحيب ──
+welcomed_users: set[int] = set()
+
 # ── فشل الموقع ──
 consecutive_failures: dict[str, int] = {k: 0 for k in CALENDAR_IDS}
 FAILURE_ALERT_AFTER = 3
@@ -269,9 +272,35 @@ def is_paused() -> bool:
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
+    name    = message.from_user.first_name or "صديقي"
+    user_id = message.from_user.id
+
+    # ── رسالة ترحيب VIP — تُرسل مرة واحدة فقط ──
+    if user_id not in welcomed_users:
+        welcomed_users.add(user_id)
+        welcome = (
+            f"✨ <b>مرحبا {name}</b> ✨\n\n"
+            f"يسعدنا نرحبو بيك في خدمة السيرفر الخاص 👑\n\n"
+            f"من هاد اللحظة بوتك يدور على حسابك وحدك\n"
+            f"— 24/7 بلا ما يوقف ⚡\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "🎯 <b>اللي راح تستافد منه:</b>\n\n"
+            "⚡ فحص أسرع من بوت القروب\n"
+            "👤 سيرفر خاص بيك وحدك\n"
+            "🔔 إشعارات فورية على رقمك\n"
+            "🛠️ دعم تقني مباشر معايا\n"
+            "🌙 ساعات صامتة على حسب وقتك\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "أي سؤال أو مشكلة — راسلني مباشرة وقت ما تحب 😊\n\n"
+            "@mo_7ou"
+        )
+        await message.answer(welcome, parse_mode="HTML")
+        return
+
     quiet_str = f"{quiet_start:02d}:00 → {quiet_end:02d}:00" if (quiet_start or quiet_end) else "معطلة"
     hb_str    = _fmt_secs(heartbeat_interval) if heartbeat_interval else "معطل"
     text = (
+        f"👋 مرحبا <b>{name}</b>!\n\n"
         "🇩🇿 <b>Mosaic Visa Monitor</b>\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
         f"📍 الجزائر  : {status_icon('algiers')} — {interval_label('algiers')} — نقصان≥{DROP_THRESHOLDS['algiers']}\n"
