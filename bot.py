@@ -279,7 +279,7 @@ async def cmd_start(message: types.Message):
     if user_id not in welcomed_users:
         welcomed_users.add(user_id)
         welcome = (
-            f"✨ <b>مرحبا {name}</b> ✨\n\n"
+            f"✨ <b>مرحبا islem </b> ✨\n\n"
             f"يسعدنا نرحبو بيك في خدمة السيرفر الخاص 👑\n\n"
             f"من هاد اللحظة بوتك يدور على حسابك وحدك\n"
             f"— 24/7 بلا ما يوقف ⚡\n\n"
