@@ -22,24 +22,30 @@ if not CHAT_ID:
     raise RuntimeError("❌ CHAT_ID غير موجود في متغيرات البيئة")
 
 DROP_THRESHOLDS: dict[str, int] = {
-    "algiers":      5,
-    "constantine":  5,
-    "oran":         5,
-    "oran_vip":     5,
+    "algiers":          5,
+    "algiers_vip":      5,
+    "constantine":      5,
+    "constantine_vip":  5,
+    "oran":             5,
+    "oran_vip":         5,
 }
 
 CHECK_INTERVALS: dict[str, int] = {
-    "algiers":      60,
-    "constantine":  60,
-    "oran":         60,
-    "oran_vip":     60,
+    "algiers":          60,
+    "algiers_vip":      60,
+    "constantine":      60,
+    "constantine_vip":  60,
+    "oran":             60,
+    "oran_vip":         60,
 }
 
 CALENDAR_IDS = {
-    "algiers":      9,
-    "constantine":  17,
-    "oran":         7,
-    "oran_vip":     8,
+    "algiers":          9,
+    "algiers_vip":      10,
+    "constantine":      17,
+    "constantine_vip":  18,
+    "oran":             7,
+    "oran_vip":         8,
 }
 
 state: dict[str, bool] = {k: False for k in CALENDAR_IDS}
@@ -68,10 +74,12 @@ consecutive_failures: dict[str, int] = {k: 0 for k in CALENDAR_IDS}
 FAILURE_ALERT_AFTER = 3
 
 NAMES = {
-    "algiers":      "الجزائر العاصمة",
-    "constantine":  "قسنطينة",
-    "oran":         "وهران",
-    "oran_vip":     "وهران VIP",
+    "algiers":          "الجزائر العاصمة",
+    "algiers_vip":      "الجزائر VIP",
+    "constantine":      "قسنطينة",
+    "constantine_vip":  "قسنطينة VIP",
+    "oran":             "وهران",
+    "oran_vip":         "وهران VIP",
 }
 
 logging.basicConfig(
@@ -218,9 +226,6 @@ async def _check_center(key: str) -> dict[str, int] | None:
     return None if failed else all_dates
 
 
-
-
-
 # ══════════════════════════════════════════
 #  🔧  دوال مساعدة
 # ══════════════════════════════════════════
@@ -303,16 +308,20 @@ async def cmd_start(message: types.Message):
         f"👋 مرحبا <b> {name} </b>!\n\n"
         "🇩🇿 <b>Mosaic Visa Monitor</b>\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"📍 الجزائر  : {status_icon('algiers')} — {interval_label('algiers')} — نقصان≥{DROP_THRESHOLDS['algiers']}\n"
-        f"📍 قسنطينة  : {status_icon('constantine')} — {interval_label('constantine')} — نقصان≥{DROP_THRESHOLDS['constantine']}\n"
-        f"📍 وهران    : {status_icon('oran')} — {interval_label('oran')} — نقصان≥{DROP_THRESHOLDS['oran']}\n"
-        f"📍 وهران VIP: {status_icon('oran_vip')} — {interval_label('oran_vip')} — نقصان≥{DROP_THRESHOLDS['oran_vip']}\n\n"
+        f"📍 الجزائر      : {status_icon('algiers')} — {interval_label('algiers')} — نقصان≥{DROP_THRESHOLDS['algiers']}\n"
+        f"📍 الجزائر VIP  : {status_icon('algiers_vip')} — {interval_label('algiers_vip')} — نقصان≥{DROP_THRESHOLDS['algiers_vip']}\n"
+        f"📍 قسنطينة      : {status_icon('constantine')} — {interval_label('constantine')} — نقصان≥{DROP_THRESHOLDS['constantine']}\n"
+        f"📍 قسنطينة VIP  : {status_icon('constantine_vip')} — {interval_label('constantine_vip')} — نقصان≥{DROP_THRESHOLDS['constantine_vip']}\n"
+        f"📍 وهران        : {status_icon('oran')} — {interval_label('oran')} — نقصان≥{DROP_THRESHOLDS['oran']}\n"
+        f"📍 وهران VIP    : {status_icon('oran_vip')} — {interval_label('oran_vip')} — نقصان≥{DROP_THRESHOLDS['oran_vip']}\n\n"
         f"🌙 ساعات صامتة : {quiet_str}\n"
         f"💓 Heartbeat    : {hb_str}\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n"
         "<b>تشغيل / إيقاف:</b>\n"
         "/algiers_on · /algiers_off\n"
+        "/algiers_vip_on · /algiers_vip_off\n"
         "/constantine_on · /constantine_off\n"
+        "/constantine_vip_on · /constantine_vip_off\n"
         "/oran_on · /oran_off\n"
         "/oran_vip_on · /oran_vip_off\n\n"
         "<b>إعدادات:</b>\n"
@@ -340,6 +349,16 @@ async def cmd_algiers_off(msg: types.Message):
     state["algiers"] = False
     await msg.answer("❌ تم إيقاف <b>الجزائر العاصمة</b>", parse_mode="HTML")
 
+@dp.message(Command("algiers_vip_on"))
+async def cmd_algiers_vip_on(msg: types.Message):
+    state["algiers_vip"] = True
+    await msg.answer("✅ تم تشغيل <b>الجزائر VIP</b>", parse_mode="HTML")
+
+@dp.message(Command("algiers_vip_off"))
+async def cmd_algiers_vip_off(msg: types.Message):
+    state["algiers_vip"] = False
+    await msg.answer("❌ تم إيقاف <b>الجزائر VIP</b>", parse_mode="HTML")
+
 @dp.message(Command("constantine_on"))
 async def cmd_constantine_on(msg: types.Message):
     state["constantine"] = True
@@ -349,6 +368,16 @@ async def cmd_constantine_on(msg: types.Message):
 async def cmd_constantine_off(msg: types.Message):
     state["constantine"] = False
     await msg.answer("❌ تم إيقاف <b>قسنطينة</b>", parse_mode="HTML")
+
+@dp.message(Command("constantine_vip_on"))
+async def cmd_constantine_vip_on(msg: types.Message):
+    state["constantine_vip"] = True
+    await msg.answer("✅ تم تشغيل <b>قسنطينة VIP</b>", parse_mode="HTML")
+
+@dp.message(Command("constantine_vip_off"))
+async def cmd_constantine_vip_off(msg: types.Message):
+    state["constantine_vip"] = False
+    await msg.answer("❌ تم إيقاف <b>قسنطينة VIP</b>", parse_mode="HTML")
 
 @dp.message(Command("oran_on"))
 async def cmd_oran_on(msg: types.Message):
@@ -377,7 +406,7 @@ async def cmd_intervals(msg: types.Message):
     text = (
         "⏱ <b>التواقيت الحالية:</b>\n\n"
         + "\n".join(
-            f"📍 {k:12} → <b>{interval_label(k)}</b> ({CHECK_INTERVALS[k]}ث)"
+            f"📍 {k:16} → <b>{interval_label(k)}</b> ({CHECK_INTERVALS[k]}ث)"
             for k in CALENDAR_IDS
         )
         + "\n\n<i>/interval [مكان] [قيمة]  مثال: /interval algiers 2m</i>"
@@ -407,7 +436,7 @@ async def cmd_interval(msg: types.Message):
 @dp.message(Command("drops"))
 async def cmd_drops(msg: types.Message):
     def lbl(k): v = DROP_THRESHOLDS[k]; return f"<b>{v}+</b>" if v else "🔕 معطل"
-    text = "📉 <b>حدود النقصان:</b>\n\n" + "\n".join(f"📍 {k:12} → {lbl(k)}" for k in CALENDAR_IDS)
+    text = "📉 <b>حدود النقصان:</b>\n\n" + "\n".join(f"📍 {k:16} → {lbl(k)}" for k in CALENDAR_IDS)
     text += "\n\n<i>/drop [مكان] [رقم]  (0 = تعطيل)</i>"
     await msg.answer(text, parse_mode="HTML")
 
@@ -863,26 +892,30 @@ async def _send_daily_report():
 
 async def set_commands():
     await bot.set_my_commands([
-        BotCommand(command="start",           description="الرئيسية"),
-        BotCommand(command="check",           description="فحص فوري"),
-        BotCommand(command="stats",           description="الإحصائيات"),
-        BotCommand(command="reset",           description="إعادة تعيين إحصائيات مركز"),
-        BotCommand(command="daily",           description="تقرير يومي فوري"),
-        BotCommand(command="intervals",       description="عرض التواقيت"),
-        BotCommand(command="interval",        description="تغيير توقيت مركز"),
-        BotCommand(command="drops",           description="عرض حدود النقصان"),
-        BotCommand(command="drop",            description="تغيير حد النقصان"),
-        BotCommand(command="quiet",           description="الساعات الصامتة"),
-        BotCommand(command="pause",           description="إيقاف مؤقت للإشعارات"),
-        BotCommand(command="heartbeat",       description="نبض التأكيد"),
-        BotCommand(command="algiers_on",      description="تشغيل الجزائر"),
-        BotCommand(command="algiers_off",     description="إيقاف الجزائر"),
-        BotCommand(command="constantine_on",  description="تشغيل قسنطينة"),
-        BotCommand(command="constantine_off", description="إيقاف قسنطينة"),
-        BotCommand(command="oran_on",         description="تشغيل وهران"),
-        BotCommand(command="oran_off",        description="إيقاف وهران"),
-        BotCommand(command="oran_vip_on",     description="تشغيل وهران VIP"),
-        BotCommand(command="oran_vip_off",    description="إيقاف وهران VIP"),
+        BotCommand(command="start",                description="الرئيسية"),
+        BotCommand(command="check",                description="فحص فوري"),
+        BotCommand(command="stats",                description="الإحصائيات"),
+        BotCommand(command="reset",                description="إعادة تعيين إحصائيات مركز"),
+        BotCommand(command="daily",                description="تقرير يومي فوري"),
+        BotCommand(command="intervals",            description="عرض التواقيت"),
+        BotCommand(command="interval",             description="تغيير توقيت مركز"),
+        BotCommand(command="drops",                description="عرض حدود النقصان"),
+        BotCommand(command="drop",                 description="تغيير حد النقصان"),
+        BotCommand(command="quiet",                description="الساعات الصامتة"),
+        BotCommand(command="pause",                description="إيقاف مؤقت للإشعارات"),
+        BotCommand(command="heartbeat",            description="نبض التأكيد"),
+        BotCommand(command="algiers_on",           description="تشغيل الجزائر"),
+        BotCommand(command="algiers_off",          description="إيقاف الجزائر"),
+        BotCommand(command="algiers_vip_on",       description="تشغيل الجزائر VIP"),
+        BotCommand(command="algiers_vip_off",      description="إيقاف الجزائر VIP"),
+        BotCommand(command="constantine_on",       description="تشغيل قسنطينة"),
+        BotCommand(command="constantine_off",      description="إيقاف قسنطينة"),
+        BotCommand(command="constantine_vip_on",   description="تشغيل قسنطينة VIP"),
+        BotCommand(command="constantine_vip_off",  description="إيقاف قسنطينة VIP"),
+        BotCommand(command="oran_on",              description="تشغيل وهران"),
+        BotCommand(command="oran_off",             description="إيقاف وهران"),
+        BotCommand(command="oran_vip_on",          description="تشغيل وهران VIP"),
+        BotCommand(command="oran_vip_off",         description="إيقاف وهران VIP"),
     ])
 
 
