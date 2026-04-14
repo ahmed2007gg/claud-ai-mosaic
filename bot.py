@@ -199,7 +199,8 @@ def parse_dates(html: str) -> dict[str, int]:
     return available
 
 
-def get_months(ahead: int = 2) -> list[str]:
+# ✅ إصلاح: ahead=3 بدل 2 لفحص 3 أشهر قادمة
+def get_months(ahead: int = 3) -> list[str]:
     now = datetime.now()
     months = []
     for i in range(ahead):
@@ -620,25 +621,24 @@ async def cmd_daily(msg: types.Message):
     await _send_daily_report()
 
 
-# ── فحص فوري ──
+# ── فحص فوري ──  ✅ إصلاح: يستخدم _check_center لفحص 3 أشهر
 @dp.message(Command("check"))
 async def cmd_check(msg: types.Message):
     await msg.answer("🔍 جاري الفحص، انتظر...")
     for key in CALENDAR_IDS:
         try:
-            cal_id = CALENDAR_IDS[key]
-            month  = get_months(1)[0]
-            async with aiohttp.ClientSession(
-                headers={"User-Agent": "Mozilla/5.0", "Accept": "text/html"}
-            ) as session:
-                html = await fetch_calendar(session, cal_id, month)
-            if html is None:
-                await msg.answer(f"❌ <b>{NAMES[key]}</b>: فشل جلب الصفحة", parse_mode="HTML"); continue
-            dates = parse_dates(html)
+            result = await _check_center(key)
+            if result is None:
+                await msg.answer(f"❌ <b>{NAMES[key]}</b>: فشل جلب الصفحة", parse_mode="HTML")
+                continue
+            dates = result
             total = sum(dates.values())
             if dates:
                 lines = "\n".join(f"  • {d} — {s} مكان" for d, s in sorted(dates.items()))
-                await msg.answer(f"✅ <b>{NAMES[key]}</b> — المجموع: <b>{total} مكان</b>\n{lines}", parse_mode="HTML")
+                await msg.answer(
+                    f"✅ <b>{NAMES[key]}</b> — المجموع: <b>{total} مكان</b>\n{lines}",
+                    parse_mode="HTML"
+                )
             else:
                 await msg.answer(f"📭 <b>{NAMES[key]}</b>: لا مواعيد", parse_mode="HTML")
         except Exception as e:
